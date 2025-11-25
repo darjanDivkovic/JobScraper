@@ -9,8 +9,12 @@ const isProd = process.env.NODE_ENV === 'production';
 
 // Launch browser once and reuse it
 let browserPromise = chromium.launch({
-  headless: isProd,          // headless in prod, visible locally
-  slowMo: isProd ? 0 : 100,  // only slow down locally
+  headless: isProd,
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-blink-features=AutomationControlled',  // ← crucial
+  ],
 });
 
 app.get('/health', (_req, res) => res.send('ok'));
