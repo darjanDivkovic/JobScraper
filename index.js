@@ -4,13 +4,13 @@ const { chromium } = require('playwright');
 const app = express();
 const PORT = process.env.PORT || 5050;
 
-// dev vs prod config
-const isProd = process.env.NODE_ENV === 'production';
-
 // Launch browser once and reuse it
 let browserPromise = chromium.launch({
-  headless: isProd,          // headless in prod, visible locally
-  slowMo: isProd ? 0 : 100,  // only slow down locally
+  headless: process.env.NODE_ENV === 'production', // headless on Render
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+  ],
 });
 
 app.get('/health', (_req, res) => res.send('ok'));
