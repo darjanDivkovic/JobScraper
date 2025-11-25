@@ -4,13 +4,13 @@ const { chromium } = require('playwright');
 const app = express();
 const PORT = process.env.PORT || 5050;
 
+// dev vs prod config
+const isProd = process.env.NODE_ENV === 'production';
+
 // Launch browser once and reuse it
 let browserPromise = chromium.launch({
-  headless: process.env.NODE_ENV === 'production', // headless on Render
-  args: [
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-  ],
+  headless: isProd,          // headless in prod, visible locally
+  slowMo: isProd ? 0 : 100,  // only slow down locally
 });
 
 app.get('/health', (_req, res) => res.send('ok'));
@@ -51,6 +51,10 @@ app.get('/scrape/remoterocketship', async (_req, res) => {
     }
 
     console.log('Extracting titles + links...');
+
+    const html = await page.content();
+    console.log("HTML LENGTH:", html.length);
+    console.log(html.slice(0, 1000));
 
     const jobs = await page.$$eval(
       'h3.text-lg.font-semibold.text-primary.mr-4',
