@@ -38,6 +38,11 @@ app.get('/scrape/remoterocketship', async (_req, res) => {
 
     page = await context.newPage();
 
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+      delete navigator.__proto__.webdriver;
+    });
+
     console.log('Loading page...');
     await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60_000 });
 
